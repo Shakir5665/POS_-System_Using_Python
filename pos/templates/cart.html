@@ -1,0 +1,36 @@
+<h1>Your Cart</h1>
+
+{% if items %}
+    <ul>
+        {% for item in items %}
+            <li>
+                {{ item.product.name }} 
+                x {{ item.quantity }} 
+                = Rs.{{ item.subTotal }}
+                
+                <!-- NEW: Remove single item  -->
+                <a href="{% url 'remove_from_cart' item.product.id %}" 
+                   onclick="return confirm('Remove {{ item.product.name }} from cart?')">
+                   ❌ Remove
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Total: Rs.{{ total }}</h2>
+
+    <!-- Clear cart -->
+    <a href="{% url 'clear_cart' %}" 
+       onclick="return confirm('Clear entire cart? This cannot be undone!')">
+       🧹 Clear Cart
+    </a>
+    <br><br>
+
+    <a href="{% url 'product_list' %}"> ← Back to Products </a>
+
+{% else %}
+
+    <p>Your cart is empty.</p>
+    <a href="{% url 'product_list' %}"> Browse Products </a>
+
+{% endif %}
