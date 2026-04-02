@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import Product
+from .models import Product,OrderItem,Order
 
 # function to display product list
 def product_list(request):
@@ -71,4 +71,45 @@ def clear_cart(request):
     request.session.modified = True
     
     return redirect('cart_view')
+
+
+def checkout(request):
+
+    cart = request.session.get('cart',{})
+
+    if not cart:
+        redirect('product_list')
+    
+    total = 0
+    order = Order.objects.create(total_amount=0)
+
+    for product_id,quantity in cart.items():
+        product = Product.objects.get(id=product_id)
+        subtotal =product.price * quantity
+        total += subtotal
+
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            quantity=quantity,
+            subTotal=subtotal
+        )
+
+        # Reduce stock
+        product.stock -= quantity
+        product.save()
+
+        
+
+    order.total_amount = total
+    order.save()
+
+    # Clear cart
+    request.session['cart'] = {}
+        
+
+
+    return render(request, 'checkout_success.html', {'order': order})
+
+
 
