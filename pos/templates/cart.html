@@ -1,5 +1,12 @@
 <h1>Your Cart</h1>
 
+{% if error %}
+    <div>
+        ❌ {{ error }}
+    </div>
+
+{% endif %}
+
 {% if items %}
     <ul>
         {% for item in items %}
@@ -35,5 +42,6 @@
 
     <p>Your cart is empty.</p>
     <a href="{% url 'product_list' %}"> Browse Products </a>
+    <a href="{% url 'order_history' %}">📜 Order History</a>
 
 {% endif %}

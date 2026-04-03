@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Product,OrderItem,Order
+from django.contrib import messages
 
 # function to display product list
 def product_list(request):
@@ -78,7 +79,16 @@ def checkout(request):
     cart = request.session.get('cart',{})
 
     if not cart:
+        messages.error(request, 'Your cart is empty!')
         redirect('product_list')
+    
+
+    #Stock Validation before checkout
+    for product_id , quantity in cart.items():
+        product = Product.objects.get(id=product_id)
+        if product.stock < quantity:
+            return render(request , 'cart.html' , {'error': f"{product.name} is not enough in Stock !"})
+        
     
     total = 0
     order = Order.objects.create(total_amount=0)
@@ -112,4 +122,7 @@ def checkout(request):
     return render(request, 'checkout_success.html', {'order': order})
 
 
+def order_history(request):
+    orders = Order.objects.all().order_by('id')
+    return render(request , 'order_history.html' , {'orders': orders})
 
